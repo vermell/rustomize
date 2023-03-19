@@ -1,5 +1,5 @@
 [package]
-name = "stage-promotion"
+name = "stage_promotion"
 version = "0.1.0"
 edition = "2021"
 
