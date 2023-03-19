@@ -1,18 +1,20 @@
 #[derive(PartialEq, Debug)]
-pub struct Stage {
+pub struct Stage<T> {
     pub name: String,
+    pub deployment: T,
 }
 
-pub trait StagePromotion {
-    fn promote(&self, from: &Stage, to: &Stage) -> Stage;
+pub trait StagePromotion<T: Copy> {
+    fn promote(&self, from: &Stage<T>, to: &Stage<T>) -> Stage<T>;
 }
 
-struct MockingDeployment;
+pub struct MockingDeployment;
 
-impl StagePromotion for MockingDeployment {
-    fn promote(&self, from: &Stage, to: &Stage) -> Stage {
+impl StagePromotion<i32> for MockingDeployment {
+    fn promote(&self, from: &Stage<i32>, to: &Stage<i32>) -> Stage<i32> {
         Stage {
-            name: from.name.clone(),
+            name: to.name.clone(),
+            deployment: from.deployment.clone(),
         }
     }
 }
@@ -25,6 +27,7 @@ mod tests {
     fn should_initialize_stage() {
         Stage {
             name: String::from("dev"),
+            deployment: 1,
         };
     }
 
@@ -33,13 +36,16 @@ mod tests {
         let deployment = MockingDeployment;
         let dev = Stage {
             name: String::from("dev"),
+            deployment: 1,
         };
         let prod = Stage {
             name: String::from("prod"),
+            deployment: 2,
         };
 
         let promoted_prod_stage = deployment.promote(&dev, &prod);
 
-        assert_eq!(dev, promoted_prod_stage);
+        assert_eq!(prod.name, promoted_prod_stage.name);
+        assert_eq!(dev.deployment, promoted_prod_stage.deployment)
     }
 }
